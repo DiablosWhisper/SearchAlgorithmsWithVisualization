@@ -1,19 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.IO;
-using System.Text;
+using System.Windows.Forms;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System;
 
 namespace SearchAlgorithmsWithVisualization
 {
     public partial class Form1 : Form
     {
+        #region Form Actions
         private void FordFulkersonStreamSearchToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show(FordFulkersonStreamSearch.CapacityOfFlow.ToString());
@@ -53,6 +54,10 @@ namespace SearchAlgorithmsWithVisualization
         private void APathSearchToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DrawResult(AStarPathSearch.ShortesPath);
+        }
+        private void InstructionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Step 1 : Load your graph.\nStep 2 : Input values to the text boxes\nStep 3 : Press \"Actions -> Calculate\".\nStep 4 : Call an appropriate function from \"Algorithms\".");
         }
         private void StartToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -141,11 +146,22 @@ namespace SearchAlgorithmsWithVisualization
 
             MessageBox.Show("All algorithms were calculated!");
         }
-        private FordFulkersonAlgorithm FordFulkersonStreamSearch { get; set; }
         private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LoadGraph();
         }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        #endregion
+
+        #region Additional Functions
+        private FordFulkersonAlgorithm FordFulkersonStreamSearch { get; set; }
         private FloydWarshallAlgorithm FloydWarshallPathSearch { get; set; }
         private BreadthFirstSearchAlgorithm BreadthFirstSearch { get; set; }
         private BellmanFordAlgorithm BellmanFordPathSearch { get; set; }
@@ -153,10 +169,6 @@ namespace SearchAlgorithmsWithVisualization
         private JohnsonAlgorithm JohnsonPathSearch { get; set; }
         private DijkstraAlgorithm DijkstraPathSearch { get; set; }
         private KruscalAlgorithm KruskalTreeSearch { get; set; }
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
         private AStarAlgorithm AStarPathSearch { get; set; }
         private PrimAlgorithm PrimTreeSearch { get; set; }
         private void DrawResult(List<Edge> Edges)
@@ -165,27 +177,29 @@ namespace SearchAlgorithmsWithVisualization
 
             for (int Index = 0; Index < Edges.Count; Index++)
             {
-                Edges[Index][0].Circle.MarkNodeAsVisited();
+                Edges[Index][0].MarkNodeAsVisited();
 
-                Edges[Index][0].Circle.FillCircle();
+                Edges[Index][0].FillCircle();
 
-                Edges[Index][0].Circle.DrawNameOfNode();
-
-                Thread.Sleep(500);
-
-                Edges[Index].Line.MarkEdgeAsVisited();
-
-                Edges[Index][0].Circle.FillCircle();
-
-                Edges[Index][0].Circle.DrawNameOfNode();
-
-                Edges[Index][1].Circle.FillCircle();
-
-                Edges[Index][1].Circle.DrawNameOfNode();
+                Edges[Index][0].DrawNameOfNode();
 
                 Thread.Sleep(500);
 
-                Edges[Index][1].Circle.MarkNodeAsVisited();
+                Edges[Index].MarkEdgeAsVisited();
+
+                Edges[Index].DrawNameOfEdge();
+
+                Edges[Index][0].FillCircle();
+
+                Edges[Index][0].DrawNameOfNode();
+
+                Edges[Index][1].FillCircle();
+
+                Edges[Index][1].DrawNameOfNode();
+
+                Thread.Sleep(500);
+
+                Edges[Index][1].MarkNodeAsVisited();
 
                 Thread.Sleep(500);
             }
@@ -220,24 +234,24 @@ namespace SearchAlgorithmsWithVisualization
 
                 if (Data.Length.Equals(3))
                 {
-                    Graph.AddNode(new Node(NumberOfNodes, new Circle(Visualizer, Data[0], int.Parse(Data[1]), int.Parse(Data[2]))));
+                    Graph.AddNode(new Node(Visualizer, NumberOfNodes, Data[0], int.Parse(Data[1]), int.Parse(Data[2])));
                 }
 
                 if (CurrentLine.StartsWith("t"))
                 {
                     Data = CurrentLine.Split(' ');
 
-                    Graph.AddTwoWayEdge(new Edge(new Line(Visualizer, double.Parse(Data[1]), Graph.SetOfNodes[int.Parse(Data[2])].Circle, Graph.SetOfNodes[int.Parse(Data[3])].Circle), Graph.SetOfNodes[int.Parse(Data[2])], Graph.SetOfNodes[int.Parse(Data[3])]));
+                    Graph.AddTwoWayEdge(new Edge(Visualizer, double.Parse(Data[1]), Graph.SetOfNodes[int.Parse(Data[2])], Graph.SetOfNodes[int.Parse(Data[3])]));
                 }
             }
 
             Reader.Close();
 
-            for(int Index = 0; Index < Graph.NumberOfNodes; Index++)
+            for (int Index = 0; Index < Graph.NumberOfNodes; Index++)
             {
-                Graph.SetOfNodes[Index].Circle.FillCircle();
+                Graph.SetOfNodes[Index].FillCircle();
 
-                Graph.SetOfNodes[Index].Circle.DrawNameOfNode();
+                Graph.SetOfNodes[Index].DrawNameOfNode();
             }
         }
         private void Reset()
@@ -246,29 +260,27 @@ namespace SearchAlgorithmsWithVisualization
 
             for (int Index = 0; Index < Graph.NumberOfNodes; Index++)
             {
-                Graph.SetOfNodes[Index].Circle.MarkNodeAsUnVisited();
+                Graph.SetOfNodes[Index].MarkNodeAsUnVisited();
             }
 
             for (int Index = 0; Index < Graph.NumberOfEdges; Index++)
             {
-                Graph.SetOfEdges[Index].Line.MarkEdgeAsUnVisited();
+                Graph.SetOfEdges[Index].MarkEdgeAsUnVisited();
             }
 
             for (int Index = 0; Index < Graph.NumberOfNodes; Index++)
             {
-                Graph.SetOfNodes[Index].Circle.FillCircle();
+                Graph.SetOfNodes[Index].FillCircle();
 
-                Graph.SetOfNodes[Index].Circle.DrawNameOfNode();
+                Graph.SetOfNodes[Index].DrawNameOfNode();
             }
         }
-        public Form1()
-        {
-            InitializeComponent();
-        }
+        #endregion
     }
 
     public static class Utilities
     {
+        #region Useful Stuff
         public static double Infinity { get { return double.PositiveInfinity; } }
         public static double Min(double FirstValue, double SecondValue)
         {
@@ -360,70 +372,50 @@ namespace SearchAlgorithmsWithVisualization
                 Console.WriteLine("\n");
             }
         }
-    }
-
-    public class Circle
-    {
-        public Circle(PictureBox Box, string Name, int CoordinateX, int CoordinateY)
-        {
-            this.Name = Name;
-
-            Node = Box.CreateGraphics();
-
-            Node.DrawEllipse(new Pen(Color.Black, 2), this.CoordinateX = CoordinateX, this.CoordinateY = CoordinateY, 35, 35);
-        }
-        public int CoordinateX { get; private set; }
-        public int CoordinateY { get; private set; }
-        public Graphics Node { get; private set; }
-        public string Name { get; private set; }
-        public void MarkNodeAsUnVisited()
-        {
-            Node.DrawEllipse(new Pen(Color.Black, 2), CoordinateX, CoordinateY, 35, 35);
-        }
-        public void MarkNodeAsVisited()
-        {
-            Node.DrawEllipse(new Pen(Color.MintCream, 3), CoordinateX, CoordinateY, 35, 35);
-        }
-        public void DrawNameOfNode()
-        {
-            Node.DrawString(Name, new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Yellow), CoordinateX + 3, CoordinateY + 5);
-        }
-        public void FillCircle()
-        {
-            Node.FillEllipse(new SolidBrush(Color.Silver), CoordinateX + 2, CoordinateY + 2 , 31,31);
-        }
-    }
-
-    public class Line
-    {
-        public Line(PictureBox Box, double Weight, Circle Start, Circle End)
-        {
-            Edge = Box.CreateGraphics();
-
-            Edge.DrawLine(new Pen(Color.Black,2), this.StartCoordinateX = Start.CoordinateX + 12, this.StartCoordinateY = Start.CoordinateY + 20, this.EndCoordinateX = End.CoordinateX + 12, this.EndCoordinateY = End.CoordinateY + 20);
-
-            Edge.DrawString((this.Weight = Weight).ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2, (EndCoordinateY + StartCoordinateY) / 2);
-        }
-        public Graphics Edge { get; private set; }
-        private int StartCoordinateX { get; set; }
-        private int StartCoordinateY { get; set; }
-        private int EndCoordinateX { get; set; }
-        private int EndCoordinateY { get; set; }
-        public void MarkEdgeAsUnVisited()
-        {
-            Edge.DrawLine(new Pen(Color.Black,2), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
-
-            Edge.DrawString((Weight).ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2 - 24, (EndCoordinateY + StartCoordinateY) / 2);
-        }
-        public void MarkEdgeAsVisited()
-        {
-            Edge.DrawLine(new Pen(Color.LightGreen, 3), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
-        }
-        public double Weight { get; set; }
+        #endregion
     }
 
     public class Node : ICloneable
     {
+        #region Graphic Presentation Of Node
+        public Node(PictureBox Box, int NumberOfInheritors, string Name, int CoordinateX, int CoordinateY)
+        {
+            Inheritors = new Node[NumberOfInheritors + 1];
+
+            this.CoordinateX = CoordinateX;
+
+            this.CoordinateY = CoordinateY;
+
+            this.Name = $"[{Name}]";
+
+            Weight = 0.0;
+
+            Index = 0;
+
+            Circle = Box.CreateGraphics();
+
+            Circle.DrawEllipse(new Pen(Color.Black, 2), CoordinateX, CoordinateY, 35, 35);
+        }
+        public void MarkNodeAsUnVisited()
+        {
+            Circle.DrawEllipse(new Pen(Color.Black, 2), CoordinateX, CoordinateY, 35, 35);
+        }
+        public void MarkNodeAsVisited()
+        {
+            Circle.DrawEllipse(new Pen(Color.MintCream, 3), CoordinateX, CoordinateY, 35, 35);
+        }
+        public void DrawNameOfNode()
+        {
+            Circle.DrawString(Name, new Font("Calibri Light", 12, FontStyle.Bold), new SolidBrush(Color.Blue), CoordinateX + 3, CoordinateY + 5);
+        }
+        public Graphics Circle { get; set; }
+        public void FillCircle()
+        {
+            Circle.FillEllipse(new SolidBrush(Color.Silver), CoordinateX + 2, CoordinateY + 2, 31, 31);
+        }
+        #endregion
+
+        #region Mathematical Presentation Of Node
         public Node(int NumberOfInheritors, string Name, int CoordinateX, int CoordinateY)
         {
             Inheritors = new Node[NumberOfInheritors + 1];
@@ -448,22 +440,6 @@ namespace SearchAlgorithmsWithVisualization
 
             Index = 0;
         }
-        public Node(int NumberOfInheritors, Circle Circle)
-        {
-            Inheritors = new Node[NumberOfInheritors + 1];
-
-            this.CoordinateX = Circle.CoordinateX;
-
-            this.CoordinateY = Circle.CoordinateY;
-
-            this.Name = $"[{Circle.Name}]";
-
-            this.Circle = Circle;
-
-            Weight = 0.0;
-
-            Index = 0;
-        }
         public double HeuristicPathWeight { get; set; }
         public double GainedPathWeight { get; set; }
         public override bool Equals(object Object)
@@ -482,7 +458,6 @@ namespace SearchAlgorithmsWithVisualization
         public Node[] Inheritors { get; set; }
         public double Weight { get; set; }
         public string Name { get; set; }
-        public Circle Circle { get; set; }
         public Node this[int Index]
         {
             get
@@ -505,44 +480,22 @@ namespace SearchAlgorithmsWithVisualization
         public int Index { get; set; }
         public object Clone()
         {
-            Node Node = null;
-
-            if (Circle != null)
+            Node Node = new Node
             {
-                Node = new Node
-                {
-                    CoordinateX = this.CoordinateX,
+                CoordinateX = this.CoordinateX,
 
-                    CoordinateY = this.CoordinateY,
+                CoordinateY = this.CoordinateY,
 
-                    Inheritors = this.Inheritors,
+                Inheritors = this.Inheritors,
 
-                    Weight = this.Weight,
+                Weight = this.Weight,
 
-                    Name = this.Name,
+                Name = this.Name,
 
-                    Circle = this.Circle,
+                Circle = this.Circle,
 
-                    Index = this.Index,
-                };
-            }
-            else
-            {
-                Node = new Node
-                {
-                    CoordinateX = this.CoordinateX,
-
-                    CoordinateY = this.CoordinateY,
-
-                    Inheritors = this.Inheritors,
-
-                    Weight = this.Weight,
-
-                    Name = this.Name,
-
-                    Index = this.Index,
-                };
-            }
+                Index = this.Index,
+            };
 
             return Node;
         }
@@ -568,10 +521,63 @@ namespace SearchAlgorithmsWithVisualization
 
             Index = 0;
         }
+        #endregion
     }
 
     public class Edge : ICloneable
     {
+        #region Graphic Presentation Of Edge
+        public Edge(PictureBox Box, double Weight, params Node[] Nodes)
+        {
+            Ends = new List<Node>();
+
+            for (int Index = 0; Index < Nodes.Length; Index++)
+            {
+                Ends.Add(Nodes[Index]);
+            }
+
+            StartCoordinateX = Nodes[0].CoordinateX + 12;
+
+            StartCoordinateY = Nodes[0].CoordinateY + 20;
+
+            EndCoordinateX = Nodes[1].CoordinateX + 12;
+
+            EndCoordinateY = Nodes[1].CoordinateY + 20;
+
+            this.Weight = Weight;
+
+            Ends[0][Nodes[1].Index] = Nodes[1];
+
+            Name = $"{Nodes[0].Name}{Nodes[1].Name}";
+
+            Line = Box.CreateGraphics();
+
+            Line.DrawLine(new Pen(Color.Black, 2), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+
+            Line.DrawString(Weight.ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2, (EndCoordinateY + StartCoordinateY) / 2);
+        }
+        private int StartCoordinateX { get; set; }
+        private int StartCoordinateY { get; set; }
+        private int EndCoordinateX { get; set; }
+        private int EndCoordinateY { get; set; }
+        public void MarkEdgeAsUnVisited()
+        {
+            Line.DrawLine(new Pen(Color.Black, 2), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+
+            Line.DrawString(Weight.ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2 , (EndCoordinateY + StartCoordinateY) / 2);
+        }
+        public void MarkEdgeAsVisited()
+        {
+            Line.DrawLine(new Pen(Color.LightGreen, 3), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+        }
+        public void DrawNameOfEdge()
+        {
+            Line.DrawString(Weight.ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2, (EndCoordinateY + StartCoordinateY) / 2);
+        }
+        public Graphics Line { get; set; }
+        #endregion
+
+        #region Mathematical Presentation Of Edge
         public Edge(double Weight, params Node[] Nodes)
         {
             Ends = new List<Node>();
@@ -582,23 +588,6 @@ namespace SearchAlgorithmsWithVisualization
             }
 
             this.Weight = Weight;
-
-            Ends[0][Nodes[1].Index] = Nodes[1];
-
-            Name = $"{Nodes[0].Name}{Nodes[1].Name}";
-        }
-        public Edge(Line Line, params Node[] Nodes)
-        {
-            Ends = new List<Node>();
-
-            this.Line = Line;
-
-            for (int Index = 0; Index < Nodes.Length; Index++)
-            {
-                Ends.Add(Nodes[Index]);
-            }
-
-            this.Weight = Line.Weight;
 
             Ends[0][Nodes[1].Index] = Nodes[1];
 
@@ -619,56 +608,53 @@ namespace SearchAlgorithmsWithVisualization
                 return null;
             }
         }
+        public Edge ReverseEdge()
+        {
+            Edge Edge = new Edge(this.Weight, this.Ends[1], this.Ends[0])
+            {
+                StartCoordinateX = this.StartCoordinateX,
+
+                StartCoordinateY = this.StartCoordinateY,
+
+                EndCoordinateX = this.EndCoordinateX,
+
+                EndCoordinateY = this.EndCoordinateY,
+
+                Line = this.Line
+            };
+
+            return Edge;
+        }
         public int Index { get; set; }
-        public Line Line { get; set; }
         public object Clone()
         {
-            Edge Edge = null;
-
-            List<Node> EndsOfEdge = null;
-
-            if (Line != null)
+            List<Node> EndsOfEdge = new List<Node>()
             {
-                EndsOfEdge = new List<Node>()
-                {
-                    (Node)this.Ends[0].Clone(),
+                (Node)this.Ends[0].Clone(),
 
-                    (Node)this.Ends[1].Clone()
-                 };
+                (Node)this.Ends[1].Clone()
+            };
 
-                Edge = new Edge
-                {
-                    Line = this.Line,
-
-                    Weight = this.Weight,
-
-                    Name = this.Name,
-
-                    Index = this.Index,
-
-                    Ends = EndsOfEdge
-                };
-            }
-            else
+            Edge Edge = new Edge
             {
-                EndsOfEdge = new List<Node>()
-                {
-                    (Node)this.Ends[0].Clone(),
+                StartCoordinateX = this.StartCoordinateX,
 
-                    (Node)this.Ends[1].Clone()
-                 };
+                StartCoordinateY = this.StartCoordinateY,
 
-                Edge = new Edge
-                {
-                    Weight = this.Weight,
+                EndCoordinateX = this.EndCoordinateX,
 
-                    Name = this.Name,
+                EndCoordinateY = this.EndCoordinateY,
 
-                    Index = this.Index,
+                Weight = this.Weight,
 
-                    Ends = EndsOfEdge
-                };
-            }
+                Ends = EndsOfEdge,
+
+                Name = this.Name,
+
+                Index = this.Index,
+
+                Line = this.Line,
+            };
 
             return Edge;
         }
@@ -684,10 +670,12 @@ namespace SearchAlgorithmsWithVisualization
 
             Index = 0;
         }
+        #endregion
     }
 
     public class Graph
     {
+        #region Mathematical Presentation Of Graph
         public int NumberOfNodes { get { return SetOfNodes.Count; } }
         public int NumberOfEdges { get { return SetOfEdges.Count; } }
         public bool NegativeCycleChecker(List<Node> Nodes)
@@ -738,11 +726,9 @@ namespace SearchAlgorithmsWithVisualization
 
             SetOfEdges[SetOfEdges.Count - 1].Index = SetOfEdges.Count - 1;
 
-            SetOfEdges.Add(new Edge(Edge.Weight, Edge[1], Edge[0]));
+            SetOfEdges.Add(Edge.ReverseEdge());
 
             SetOfEdges[SetOfEdges.Count - 1].Index = SetOfEdges.Count - 1;
-
-            SetOfEdges[SetOfEdges.Count - 1].Line = Edge.Line;
         }
         public void AddNode(Node Node)
         {
@@ -781,8 +767,10 @@ namespace SearchAlgorithmsWithVisualization
 
             SetOfEdges = new List<Edge>();
         }
+        #endregion
     }
 
+    #region Algorithms
     public class DepthFirstSearchAlgorithm
     {
         public bool DepthFirstSearch(Node Start, Node Target, Node[] FoundPath)
@@ -1452,4 +1440,5 @@ namespace SearchAlgorithmsWithVisualization
         }
         public List<Edge> ShortesPath { get; }
     }
+    #endregion
 }

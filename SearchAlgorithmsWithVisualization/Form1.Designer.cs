@@ -44,7 +44,6 @@
             this.aPathSearchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Visualizer = new System.Windows.Forms.PictureBox();
             this.DFS = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -60,6 +59,7 @@
             this.DPS = new System.Windows.Forms.TextBox();
             this.FFSS = new System.Windows.Forms.TextBox();
             this.ASPS = new System.Windows.Forms.TextBox();
+            this.InstructionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Visualizer)).BeginInit();
             this.SuspendLayout();
@@ -69,7 +69,8 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.graphToolStripMenuItem,
             this.algorithmsToolStripMenuItem,
-            this.actionsToolStripMenuItem});
+            this.actionsToolStripMenuItem,
+            this.InstructionToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1281, 24);
@@ -181,8 +182,7 @@
             // actionsToolStripMenuItem
             // 
             this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.startToolStripMenuItem,
-            this.clearToolStripMenuItem});
+            this.startToolStripMenuItem});
             this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
             this.actionsToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
             this.actionsToolStripMenuItem.Text = "Actions";
@@ -193,12 +193,6 @@
             this.startToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.startToolStripMenuItem.Text = "Calculate";
             this.startToolStripMenuItem.Click += new System.EventHandler(this.StartToolStripMenuItem_Click);
-            // 
-            // clearToolStripMenuItem
-            // 
-            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
-            this.clearToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.clearToolStripMenuItem.Text = "Clear";
             // 
             // Visualizer
             // 
@@ -322,6 +316,13 @@
             this.ASPS.Size = new System.Drawing.Size(108, 20);
             this.ASPS.TabIndex = 19;
             // 
+            // InstructionToolStripMenuItem
+            // 
+            this.InstructionToolStripMenuItem.Name = "InstructionToolStripMenuItem";
+            this.InstructionToolStripMenuItem.Size = new System.Drawing.Size(76, 20);
+            this.InstructionToolStripMenuItem.Text = "Instruction";
+            this.InstructionToolStripMenuItem.Click += new System.EventHandler(this.InstructionToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -373,7 +374,6 @@
         private System.Windows.Forms.ToolStripMenuItem aPathSearchToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem actionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem startToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
         private System.Windows.Forms.PictureBox Visualizer;
         private System.Windows.Forms.TextBox DFS;
         private System.Windows.Forms.Label label1;
@@ -389,6 +389,7 @@
         private System.Windows.Forms.TextBox DPS;
         private System.Windows.Forms.TextBox FFSS;
         private System.Windows.Forms.TextBox ASPS;
+        private System.Windows.Forms.ToolStripMenuItem InstructionToolStripMenuItem;
     }
 }
 
