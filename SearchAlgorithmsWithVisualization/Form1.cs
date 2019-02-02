@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Drawing.Drawing2D;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace SearchAlgorithmsWithVisualization
 {
     public partial class Form1 : Form
     {
-        #region Form Actions
+        #region Buttons And Etc.
         private void FordFulkersonStreamSearchToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show(FordFulkersonStreamSearch.CapacityOfFlow.ToString());
@@ -160,7 +161,7 @@ namespace SearchAlgorithmsWithVisualization
         }
         #endregion
 
-        #region Additional Functions
+        #region Functions
         private FordFulkersonAlgorithm FordFulkersonStreamSearch { get; set; }
         private FloydWarshallAlgorithm FloydWarshallPathSearch { get; set; }
         private BreadthFirstSearchAlgorithm BreadthFirstSearch { get; set; }
@@ -394,6 +395,8 @@ namespace SearchAlgorithmsWithVisualization
 
             Circle = Box.CreateGraphics();
 
+            Circle.SmoothingMode = SmoothingMode.HighQuality;
+
             Circle.DrawEllipse(new Pen(Color.Black, 2), CoordinateX, CoordinateY, 35, 35);
         }
         public void MarkNodeAsUnVisited()
@@ -552,6 +555,8 @@ namespace SearchAlgorithmsWithVisualization
 
             Line = Box.CreateGraphics();
 
+            Line.SmoothingMode = SmoothingMode.HighQuality;
+
             Line.DrawLine(new Pen(Color.Black, 2), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
 
             Line.DrawString(Weight.ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2, (EndCoordinateY + StartCoordinateY) / 2);
@@ -568,7 +573,7 @@ namespace SearchAlgorithmsWithVisualization
         }
         public void MarkEdgeAsVisited()
         {
-            Line.DrawLine(new Pen(Color.LightGreen, 3), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+            Line.DrawLine(new Pen(Color.White, 3), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
         }
         public void DrawNameOfEdge()
         {
