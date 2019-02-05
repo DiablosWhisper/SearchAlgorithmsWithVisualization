@@ -1,13 +1,10 @@
-﻿using System.Drawing.Drawing2D;
+using System.Drawing.Drawing2D;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
-using System.Threading.Tasks;
 using System.Threading;
 using System.Drawing;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System;
 
@@ -18,6 +15,8 @@ namespace SearchAlgorithmsWithVisualization
         #region Buttons And Etc.
         private void FordFulkersonStreamSearchToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            DrawResultForFordFulkerson(FordFulkersonStreamSearch.AllPathes);
+
             MessageBox.Show(FordFulkersonStreamSearch.CapacityOfFlow.ToString());
         }
         private void FloydWarshallPathSearchToolStripMenuItem_Click(object sender, EventArgs e)
@@ -26,6 +25,8 @@ namespace SearchAlgorithmsWithVisualization
         }
         private void BellmanFordPahSearchToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            DrawResult(BellmanFordPathSearch.VisitedEdges);
+
             MessageBox.Show(Utilities.GetResult(BellmanFordPathSearch.ShortestPathes, Graph.SetOfNodes[int.Parse(BFPS.Text)]));
         }
         private void JohnsonPathSearchToolStripMenuItem_Click(object sender, EventArgs e)
@@ -38,6 +39,8 @@ namespace SearchAlgorithmsWithVisualization
         }
         private void DijkstraPathSearchToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            DrawResult(DijkstraPathSearch.VisitedEdges);
+
             MessageBox.Show(Utilities.GetResult(DijkstraPathSearch.ShortestPathes, Graph.SetOfNodes[int.Parse(DPS.Text)]));
         }
         private void KruskalTreeSearchToolStripMenuItem_Click(object sender, EventArgs e)
@@ -79,8 +82,6 @@ namespace SearchAlgorithmsWithVisualization
             JohnsonPathSearch = new JohnsonAlgorithm(Graph);
 
             AStarPathSearch = new AStarAlgorithm(Graph);
-
-            FordFulkersonStreamSearch = new FordFulkersonAlgorithm(Graph);
 
             string[] Request = DFS.Text.Split(' ');
 
@@ -131,11 +132,13 @@ namespace SearchAlgorithmsWithVisualization
 
             JohnsonPathSearch.FindAllTheShortestPathes();
 
+            FordFulkersonStreamSearch = new FordFulkersonAlgorithm(Graph);
+
             Request = FFSS.Text.Split(' ');
 
             if (Request.Length.Equals(2) && Request[0] != "" && Request[1] != "")
             {
-                FordFulkersonStreamSearch.FindMaximumFlowWithDFSRealization(Graph.SetOfNodes[int.Parse(Request[0])], Graph.SetOfNodes[int.Parse(Request[1])]);
+                FordFulkersonStreamSearch.FindMaximumFlowWithBFSRealization(Graph.SetOfNodes[int.Parse(Request[0])], Graph.SetOfNodes[int.Parse(Request[1])]);
             }
 
             Request = ASPS.Text.Split(' ');
@@ -164,6 +167,46 @@ namespace SearchAlgorithmsWithVisualization
         #region Functions
         private FordFulkersonAlgorithm FordFulkersonStreamSearch { get; set; }
         private FloydWarshallAlgorithm FloydWarshallPathSearch { get; set; }
+        private void DrawResultForFordFulkerson(List<List<Edge>> Edges)
+        {
+            for (int FirstIndex = 0; FirstIndex < Edges.Count; FirstIndex++)
+            {
+                Visualizer.Refresh();
+
+                Reset(false);
+
+                for (int SecondIndex = 0; SecondIndex < Edges[FirstIndex].Count; SecondIndex++)
+                {
+                    Edges[FirstIndex][SecondIndex][0].MarkNodeAsVisited();
+
+                    Edges[FirstIndex][SecondIndex][0].FillCircle();
+
+                    Edges[FirstIndex][SecondIndex][0].DrawNameOfNode();
+
+                    Thread.Sleep(500);
+
+                    Edges[FirstIndex][SecondIndex].MarkEdgeAsVisited();
+
+                    Edges[FirstIndex][SecondIndex].DrawNameOfEdge(Edges[FirstIndex][SecondIndex].ReversedWeight.ToString());
+
+                    Edges[FirstIndex][SecondIndex][0].FillCircle();
+
+                    Edges[FirstIndex][SecondIndex][0].DrawNameOfNode();
+
+                    Edges[FirstIndex][SecondIndex][1].FillCircle();
+
+                    Edges[FirstIndex][SecondIndex][1].DrawNameOfNode();
+
+                    Thread.Sleep(1000);
+
+                    Edges[FirstIndex][SecondIndex][1].MarkNodeAsVisited();
+
+                    Thread.Sleep(1000);
+                }
+
+                Thread.Sleep(2000);
+            }
+        }
         private BreadthFirstSearchAlgorithm BreadthFirstSearch { get; set; }
         private BellmanFordAlgorithm BellmanFordPathSearch { get; set; }
         private DepthFirstSearchAlgorithm DepthFirstSearch { get; set; }
@@ -172,9 +215,35 @@ namespace SearchAlgorithmsWithVisualization
         private KruscalAlgorithm KruskalTreeSearch { get; set; }
         private AStarAlgorithm AStarPathSearch { get; set; }
         private PrimAlgorithm PrimTreeSearch { get; set; }
+        private void Reset(bool DrawNameOfEdge)
+        {
+            Visualizer.Refresh();
+
+            for (int Index = 0; Index < Graph.NumberOfNodes; Index++)
+            {
+                Graph.SetOfNodes[Index].MarkNodeAsUnVisited();
+            }
+
+            for (int Index = 0; Index < Graph.NumberOfEdges; Index++)
+            {
+                Graph.SetOfEdges[Index].MarkEdgeAsUnVisited();
+
+                if (DrawNameOfEdge.Equals(true))
+                {
+                    Graph.SetOfEdges[Index].DrawNameOfEdge();
+                }
+            }
+
+            for (int Index = 0; Index < Graph.NumberOfNodes; Index++)
+            {
+                Graph.SetOfNodes[Index].FillCircle();
+
+                Graph.SetOfNodes[Index].DrawNameOfNode();
+            }
+        }
         private void DrawResult(List<Edge> Edges)
         {
-            Reset();
+            Reset(true);
 
             for (int Index = 0; Index < Edges.Count; Index++)
             {
@@ -242,32 +311,18 @@ namespace SearchAlgorithmsWithVisualization
                 {
                     Data = CurrentLine.Split(' ');
 
-                    Graph.AddTwoWayEdge(new Edge(Visualizer, double.Parse(Data[1]), Graph.SetOfNodes[int.Parse(Data[2])], Graph.SetOfNodes[int.Parse(Data[3])]));
+                    Graph.AddTwoWayEdge(new Edge(Visualizer, double.Parse(Data[1]), false, Graph.SetOfNodes[int.Parse(Data[2])], Graph.SetOfNodes[int.Parse(Data[3])]));
+                }
+
+                if (CurrentLine.StartsWith("o"))
+                {
+                    Data = CurrentLine.Split(' ');
+
+                    Graph.AddOneWayEdge(new Edge(Visualizer, double.Parse(Data[1]), true, Graph.SetOfNodes[int.Parse(Data[2])], Graph.SetOfNodes[int.Parse(Data[3])]));
                 }
             }
 
             Reader.Close();
-
-            for (int Index = 0; Index < Graph.NumberOfNodes; Index++)
-            {
-                Graph.SetOfNodes[Index].FillCircle();
-
-                Graph.SetOfNodes[Index].DrawNameOfNode();
-            }
-        }
-        private void Reset()
-        {
-            Visualizer.Refresh();
-
-            for (int Index = 0; Index < Graph.NumberOfNodes; Index++)
-            {
-                Graph.SetOfNodes[Index].MarkNodeAsUnVisited();
-            }
-
-            for (int Index = 0; Index < Graph.NumberOfEdges; Index++)
-            {
-                Graph.SetOfEdges[Index].MarkEdgeAsUnVisited();
-            }
 
             for (int Index = 0; Index < Graph.NumberOfNodes; Index++)
             {
@@ -530,7 +585,7 @@ namespace SearchAlgorithmsWithVisualization
     public class Edge : ICloneable
     {
         #region Graphic Presentation Of Edge
-        public Edge(PictureBox Box, double Weight, params Node[] Nodes)
+        public Edge(PictureBox Box, double Weight, bool Directed, params Node[] Nodes)
         {
             Ends = new List<Node>();
 
@@ -549,6 +604,10 @@ namespace SearchAlgorithmsWithVisualization
 
             this.Weight = Weight;
 
+            this.Directed = Directed;
+
+            ReversedWeight = 0;
+
             Ends[0][Nodes[1].Index] = Nodes[1];
 
             Name = $"{Nodes[0].Name}{Nodes[1].Name}";
@@ -557,9 +616,24 @@ namespace SearchAlgorithmsWithVisualization
 
             Line.SmoothingMode = SmoothingMode.HighQuality;
 
-            Line.DrawLine(new Pen(Color.Black, 2), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+            if (Directed.Equals(true))
+            {
+                Gradient = new LinearGradientBrush(new Point(StartCoordinateX, StartCoordinateY), new Point(EndCoordinateX, EndCoordinateY), Color.Black, Color.White);
 
-            Line.DrawString(Weight.ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2, (EndCoordinateY + StartCoordinateY) / 2);
+                Line.DrawLine(new Pen(Gradient, 2), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+
+                Line.DrawString(Weight.ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2, (EndCoordinateY + StartCoordinateY) / 2);
+            }
+            else
+            {
+                Line.DrawLine(new Pen(Color.Black, 2), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+
+                Line.DrawString(Weight.ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2, (EndCoordinateY + StartCoordinateY) / 2);
+            }
+        }
+        public void DrawNameOfEdge(string AdditionalInformation)
+        {
+            Line.DrawString($"{Weight}/{AdditionalInformation}", new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2 - 10, (EndCoordinateY + StartCoordinateY) / 2);
         }
         private int StartCoordinateX { get; set; }
         private int StartCoordinateY { get; set; }
@@ -567,18 +641,36 @@ namespace SearchAlgorithmsWithVisualization
         private int EndCoordinateY { get; set; }
         public void MarkEdgeAsUnVisited()
         {
-            Line.DrawLine(new Pen(Color.Black, 2), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+            if (Directed.Equals(true))
+            {
+                Gradient = new LinearGradientBrush(new Point(StartCoordinateX, StartCoordinateY), new Point(EndCoordinateX, EndCoordinateY), Color.Black, Color.White);
 
-            Line.DrawString(Weight.ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2 , (EndCoordinateY + StartCoordinateY) / 2);
+                Line.DrawLine(new Pen(Gradient, 2), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+
+                return;
+            }
+
+            Line.DrawLine(new Pen(Color.Black, 2), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
         }
         public void MarkEdgeAsVisited()
         {
-            Line.DrawLine(new Pen(Color.White, 3), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+            if (Directed.Equals(true))
+            {
+                Gradient = new LinearGradientBrush(new Point(StartCoordinateX, StartCoordinateY), new Point(EndCoordinateX, EndCoordinateY), Color.DarkGreen, Color.White);
+
+                Line.DrawLine(new Pen(Gradient, 3), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
+
+                return;
+            }
+
+            Line.DrawLine(new Pen(Color.MintCream, 3), StartCoordinateX, StartCoordinateY, EndCoordinateX, EndCoordinateY);
         }
+        private Brush Gradient { get; set; }
         public void DrawNameOfEdge()
         {
             Line.DrawString(Weight.ToString(), new Font("Calibri Light", 15, FontStyle.Bold), new SolidBrush(Color.Red), (EndCoordinateX + StartCoordinateX) / 2, (EndCoordinateY + StartCoordinateY) / 2);
         }
+        private bool Directed { get; set; }
         public Graphics Line { get; set; }
         #endregion
 
@@ -599,6 +691,7 @@ namespace SearchAlgorithmsWithVisualization
             Name = $"{Nodes[0].Name}{Nodes[1].Name}";
         }
         public List<Node> Ends { get; private set; }
+        public double ReversedWeight { get; set; }
         public string Name { get; private set; }
         public double Weight { get; set; }
         public Node this[int Index]
@@ -621,9 +714,15 @@ namespace SearchAlgorithmsWithVisualization
 
                 StartCoordinateY = this.StartCoordinateY,
 
+                ReversedWeight = this.ReversedWeight,
+
                 EndCoordinateX = this.EndCoordinateX,
 
                 EndCoordinateY = this.EndCoordinateY,
+
+                Gradient = this.Gradient,
+
+                Directed = this.Directed,
 
                 Line = this.Line
             };
@@ -648,7 +747,13 @@ namespace SearchAlgorithmsWithVisualization
 
                 EndCoordinateX = this.EndCoordinateX,
 
+                ReversedWeight = this.ReversedWeight,
+
                 EndCoordinateY = this.EndCoordinateY,
+
+                Gradient = this.Gradient,
+
+                Directed = this.Directed,
 
                 Weight = this.Weight,
 
@@ -667,7 +772,13 @@ namespace SearchAlgorithmsWithVisualization
         {
             Ends = new List<Node>();
 
+            ReversedWeight = 0.0;
+
             Name = string.Empty;
+
+            Directed = false;
+
+            Gradient = null;
 
             Weight = 0.0;
 
@@ -706,6 +817,17 @@ namespace SearchAlgorithmsWithVisualization
             return true;
         }
         public List<Node> SetOfNodes { get; private set; }
+        public List<Edge> Copy(List<Edge> CurrentSet)
+        {
+            List<Edge> Edges = new List<Edge>();
+
+            for (int Index = 0; Index < CurrentSet.Count; Index++)
+            {
+                Edges.Add((Edge)CurrentSet[Index].Clone());
+            }
+
+            return Edges;
+        }
         public List<Edge> SetOfEdges { get; private set; }
         public Edge FindEdge(params Node[] Nodes)
         {
@@ -717,7 +839,7 @@ namespace SearchAlgorithmsWithVisualization
                 }
             }
 
-            return new Edge { Weight = double.PositiveInfinity };
+            return null;
         }
         public void AddOneWayEdge(Edge Edge)
         {
@@ -1097,11 +1219,16 @@ namespace SearchAlgorithmsWithVisualization
         {
             ShortestPathes[Start.Index].Weight = 0;
 
-            for (int FirstIndex = 1; FirstIndex < InnerGraph.NumberOfNodes - 1; FirstIndex++)
+            for (int FirstIndex = 0; FirstIndex < InnerGraph.NumberOfNodes - 1; FirstIndex++)
             {
                 for (int SecondIndex = 0; SecondIndex < InnerGraph.NumberOfEdges; SecondIndex++)
                 {
                     ShortestPathes[InnerGraph.SetOfEdges[SecondIndex][1].Index].Weight = Utilities.Min(ShortestPathes[InnerGraph.SetOfEdges[SecondIndex][1].Index].Weight, ShortestPathes[InnerGraph.SetOfEdges[SecondIndex][0].Index].Weight + InnerGraph.SetOfEdges[SecondIndex].Weight);
+
+                    if (!VisitedEdges.Contains(InnerGraph.SetOfEdges[SecondIndex]))
+                    {
+                        VisitedEdges.Add(InnerGraph.SetOfEdges[SecondIndex]);
+                    }
                 }
             }
 
@@ -1109,6 +1236,8 @@ namespace SearchAlgorithmsWithVisualization
         }
         public BellmanFordAlgorithm(Graph Graph)
         {
+            VisitedEdges = new List<Edge>();
+
             InnerGraph = (Graph)Graph.Clone();
 
             ShortestPathes = InnerGraph.SetOfNodes;
@@ -1116,6 +1245,7 @@ namespace SearchAlgorithmsWithVisualization
             Utilities.SetNodesWeightOfInfinity(ShortestPathes);
         }
         private static Graph InnerGraph { get; set; }
+        public List<Edge> VisitedEdges { get; }
     }
 
     public class DijkstraAlgorithm
@@ -1146,6 +1276,8 @@ namespace SearchAlgorithmsWithVisualization
                     if (!VisitedNodes.Contains(ShortestPathes[SecondIndex]) && InnerGraph.SetOfNodes[Index][SecondIndex] != null && !ShortestPathes[Index].Weight.Equals(Utilities.Infinity) && ShortestPathes[SecondIndex].Weight > ShortestPathes[Index].Weight + InnerGraph.FindEdge(InnerGraph.SetOfNodes[Index], InnerGraph.SetOfNodes[SecondIndex]).Weight)
                     {
                         ShortestPathes[SecondIndex].Weight = ShortestPathes[Index].Weight + InnerGraph.FindEdge(InnerGraph.SetOfNodes[Index], InnerGraph.SetOfNodes[SecondIndex]).Weight;
+
+                        VisitedEdges.Add(InnerGraph.FindEdge(InnerGraph.SetOfNodes[Index], InnerGraph.SetOfNodes[SecondIndex]));
                     }
                 }
             }
@@ -1161,9 +1293,12 @@ namespace SearchAlgorithmsWithVisualization
 
             VisitedNodes = new List<Node>();
 
+            VisitedEdges = new List<Edge>();
+
             Utilities.SetNodesWeightOfInfinity(ShortestPathes);
         }
         private List<Node> VisitedNodes { get; }
+        public List<Edge> VisitedEdges { get; }
         private int Index { get; set; }
     }
 
@@ -1306,10 +1441,23 @@ namespace SearchAlgorithmsWithVisualization
 
                 for (int Index = Target.Index; Index != Start.Index; Index = FoundPath[Index].Index)
                 {
-                    InnerGraph.FindEdge(CurrentNode, InnerGraph.SetOfNodes[Index]).Weight -= CurrentStreamCapacity;
+                    CurrentNode = FoundPath[Index];
 
-                    InnerGraph.FindEdge(InnerGraph.SetOfNodes[Index], CurrentNode).Weight += CurrentStreamCapacity;
+                    if (InnerGraph.FindEdge(CurrentNode, InnerGraph.SetOfNodes[Index]) != null)
+                    {
+                        InnerGraph.FindEdge(CurrentNode, InnerGraph.SetOfNodes[Index]).Weight -= CurrentStreamCapacity;
+
+                        InnerGraph.FindEdge(CurrentNode, InnerGraph.SetOfNodes[Index]).ReversedWeight += CurrentStreamCapacity;
+
+                        VisitedEdges.Add(InnerGraph.FindEdge(CurrentNode, InnerGraph.SetOfNodes[Index]));
+                    }
                 }
+
+                VisitedEdges.Reverse();
+
+                AllPathes.Add(new List<Edge>(InnerGraph.Copy(VisitedEdges)));
+
+                VisitedEdges.Clear();
 
                 CapacityOfFlow += CurrentStreamCapacity;
 
@@ -1342,10 +1490,23 @@ namespace SearchAlgorithmsWithVisualization
 
                 for (int Index = Target.Index; Index != Start.Index; Index = FoundPath[Index].Index)
                 {
-                    InnerGraph.FindEdge(CurrentNode, InnerGraph.SetOfNodes[Index]).Weight -= CurrentStreamCapacity;
+                    CurrentNode = FoundPath[Index];
 
-                    InnerGraph.FindEdge(InnerGraph.SetOfNodes[Index], CurrentNode).Weight += CurrentStreamCapacity;
+                    if (InnerGraph.FindEdge(CurrentNode, InnerGraph.SetOfNodes[Index]) != null)
+                    {
+                        InnerGraph.FindEdge(CurrentNode, InnerGraph.SetOfNodes[Index]).Weight -= CurrentStreamCapacity;
+
+                        InnerGraph.FindEdge(CurrentNode, InnerGraph.SetOfNodes[Index]).ReversedWeight += CurrentStreamCapacity;
+
+                        VisitedEdges.Add(InnerGraph.FindEdge(CurrentNode, InnerGraph.SetOfNodes[Index]));
+                    }
                 }
+
+                VisitedEdges.Reverse();
+
+                AllPathes.Add(new List<Edge> (InnerGraph.Copy(VisitedEdges)));
+
+                VisitedEdges.Clear();
 
                 CapacityOfFlow += CurrentStreamCapacity;
 
@@ -1356,6 +1517,7 @@ namespace SearchAlgorithmsWithVisualization
         }
         private static BreadthFirstSearchAlgorithm BreadthFirstSearch { get; set; }
         private static DepthFirstSearchAlgorithm DepthFirstSearch { get; set; }
+        public List<List<Edge>> AllPathes { get; private set; }
         public double CapacityOfFlow { get; private set; }
         public FordFulkersonAlgorithm(Graph Graph)
         {
@@ -1367,9 +1529,14 @@ namespace SearchAlgorithmsWithVisualization
 
             FoundPath = new Node[InnerGraph.NumberOfNodes];
 
+            VisitedEdges = new List<Edge>();
+
             CapacityOfFlow = 0.0;
+
+            AllPathes = new List<List<Edge>>();
         }
         private static Graph InnerGraph { get; set; }
+        private List<Edge> VisitedEdges { get; set; }
         private Node[] FoundPath { get; set; }
     }
 
